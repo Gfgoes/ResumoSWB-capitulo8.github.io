@@ -19,6 +19,49 @@
     “return from interrupt”, a qual retira o estado apropriado de volta para o controle do processador e os registradores 
     de dados restauram o estado “user mode” se a exceção interrompe o programa do usuário, e então retorna o controle para 
     o programar interrompido.</p>
+   
+   <p>
+    Exceções podem ser divididas em quatro classes: interrupção, armadilhas(trap) e chamado do sistema, faltas e abortos.
+    Interrupções ocorrem de forma assíncrona como resultado de sinais enviados por dispositivos de entrada e saída que estão
+    externos ao processador. Depois que o tratamento da instrução termina, ela retorna para a próxima instrução. 
+    Traps são exceções intencionais que ocorrem como resultado de uma execução de instrução.  O uso mais importante de traps
+    são para procedimentos entre o programa e kernel conhecido como chamadas de sistema. Faltas resultam de erros 
+    condicionais que o manipulador deve estar apto para resolver. Quando as faltas acontecem, o processador transferi o 
+    controle para o manipulador de falta. Abortos resultam de erros fatais irrecuperáveis , tipicamente erros de hardware 
+    tais como, erros de paridade que ocorre qnd bits de  DRAM e SRAM estão corrompidos.
+   </p>
+   
+   <p>
+   No linux /x86-64 existem as exceções definidas pela intel, que vão de 0-31 e as interrupções e traps que são definidas 
+    pelo sistema operacional, que vão da 32-255. As chamadas de sistema (é o mecanismo pelo qual o usuário chama um 
+    procedimento de kernel) é utilizada para realizar a entrada e saída, arquivos de leitura/gravação e etc. seu mecanismo 
+    básico é muito similar ao tratamento de exceções: gera uma trap, chama o manipulador de exceções  do kernel, o sistema 
+    operacional identifica qual chamada de sistema é necessária e procedimento relevante e por fim retorna a execução para 
+    o processo do usuário na conclusão. As chamadas de sistema são implementadas via INT0x80(INT0x2c no windows) ou 
+    instrução syscall, cada chamada dos sistema x86-64 tem um numero de ID exclusivo que é passado pelo registrador rax.
+   </p>
+   
+   <p>
+    Exceções são os blocos básicos de construção que permitem o sistema operacional providenciar a noção de processo. 
+    Quando executamos um programa num sistema moderno, temos a sensação de que nosso programa é o único que esta sendo 
+    executado naquele instante, essa ilusão é providenciados para o usuário graças a noção de processos. A definição 
+    clássica de processo é uma instância de um programa em execução, cada programa no sistema é executado no contesto de 
+    processos. As principais partes que o processo prover para a aplicação são: um fluxo de controle lógico que prover a 
+    ilusão que nosso programa é o único sendo executado pelo processador e um espaço de endereço privado que fornece a 
+    ilusão de que o programa possui uso exclusivo do sistema de memoria.
+   </p>
+   
+   <p>
+    Para o tratamento de erros de chamada de sistemas os programadores devem sempre verificar os códigos de erro retornados pelas 
+    funções no nível do sistema. Existem muitas maneiras sutis de as coisas darem errado, e isso só serve para usar as 
+    informações de status que o kernel é capaz de nos fornecer. Infelizmente, os programadores costumam relutar em fazer a 
+    verificação de erros, porque isso confunde o código, transformando uma única linha de código em uma instrução condicional 
+    de várias linhas. A verificação de erros também é confusa porque diferentes funções indicam erros em diferentes maneiras
+   </p>
+   
+   <p>
+    No que diz relação ao controle de processos o unix fornece um numero de chamadas de sistema para manipulação de processos. Para se obter o ID dos processos, cada processo possui um ID(PID) de processo único e positivo, para isso é utilizada a função getpid , que ira retornar o ID da chamada do processo. Na perspetiva do programa, pode-se pensar que um processo pode assumir um do strês estado: Rodando: o processo está sendo executado ou esperando para ser executado e pode ser escalonado pelo kernel. Parado: o processo está suspenso e não pode ser escalonado. Terminado: o processo está parado permanentemente. Um processo pode criar um novo processo filho através da função fork, o processo filho gerado é quase idêntico ao processo pai.
+   </p>
   </body>
   <style>
    body
