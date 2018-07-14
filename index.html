@@ -6,6 +6,7 @@
     <meta charset="utf-8">
   </head>
   <body>
+   <h1>Resumo Capitulo 8 - SWB</h1>
    <p>O capitulo começa falando sobre exceções. Exceções são as formas com que os fluxos de controle são implementadas parte 
     pelo hardware parte pelo sistema operacional. Como eles são parcialmente implementados pelo hardware, os detalhes variam de
     sistema para sistema. Uma exceção  é uma mudança brusca no fluxo de controle em resposta para algo que foi alterado no
@@ -60,7 +61,71 @@
    </p>
    
    <p>
-    No que diz relação ao controle de processos o unix fornece um numero de chamadas de sistema para manipulação de processos. Para se obter o ID dos processos, cada processo possui um ID(PID) de processo único e positivo, para isso é utilizada a função getpid , que ira retornar o ID da chamada do processo. Na perspetiva do programa, pode-se pensar que um processo pode assumir um do strês estado: Rodando: o processo está sendo executado ou esperando para ser executado e pode ser escalonado pelo kernel. Parado: o processo está suspenso e não pode ser escalonado. Terminado: o processo está parado permanentemente. Um processo pode criar um novo processo filho através da função fork, o processo filho gerado é quase idêntico ao processo pai.
+    No que diz relação ao controle de processos o unix fornece um numero de chamadas de sistema para manipulação de processos.
+    Para se obter o ID dos processos, cada processo possui um ID(PID) de processo único e positivo, para isso é utilizada a 
+    função getpid , que ira retornar o ID da chamada do processo. Na perspetiva do programa, pode-se pensar que um processo 
+    pode assumir um do strês estado: Rodando: o processo está sendo executado ou esperando para ser executado e pode ser 
+    escalonado pelo kernel. Parado: o processo está suspenso e não pode ser escalonado. Terminado: o processo está parado 
+    permanentemente. Um processo pode criar um novo processo filho através da função fork, o processo filho gerado é quase 
+    idêntico ao processo pai.
+   </p>
+   
+   <p>
+    Quando um processo termina por alguma razão, o kernel não o remove  imediatamente do sistema. Pelo contrario, o processo 
+    é mantido em um estado terminado até que ele seja colhido pelo pelo processo pai. Quando o pai, recolhe o filho 
+    terminado, o kernel passa o estado de saída do processo filho para o processo pai, so então que o kernel descarta esse 
+    processo, somente nesse ponto que o processa deixa de existir. Um processo terminado que não seja colhido, é chamado de 
+    zumbi.Se o processo pai terminar sem colher o processo zumbi, o kernel organiza para que o processo init colha ele. O 
+    processo init tem o PID de 1 que é criado pelo kernel durante a inicialização do sistema. Programas de longa duração, 
+    tais como conchas e servidores devem sempre colher seus processos filhos zumbi. Até mesmo os zumbis que não estejam 
+    rodando, eles consomem recursos de memoria do sistema. Um processo espera seus processos filhos terminarem ou termina 
+    chamando a função de parada “waitpid”.
+   </p>
+   
+   <p>
+    Para carregar e executar programas existe a função execve, ela carrega e executa o arquivo objeto, com parâmetros uma 
+    lista de argumentos argv e uma lista de ambientes variados envp. Se ele executar normalmente não haverá retorno, porem 
+    caso contrario irá retornar -1 ou erro. Pode-se utilizar tanto a função execve para executar programas quanto a função 
+    fork, algumas diferenças: fork a função é chamada uma ves mas retorna 2 vezes e executa o mesmo programa em um novo 
+    processo filho que é uma copia do pai. O execvr a função é chamada uma vez e não tem retorno, carrega e executa um novo 
+    programa no contexto do processo atual  e mantém o mesmo PID.
+   </p>
+   
+   <p>
+    Sinais são formas de softwares de alto nivel para  fluxo de controle excepcional, que permitem que processos e o próprio
+    kernel interrompam outros processos. O Sinal é uma pequena mensagem que notifica que um evento ocorreu no sistema. Cada 
+    tipo de sinal corresponde a um evento em particular que ocorreu no sistema . A transferência de um sinal para um 
+    determinado processo ocorrem em duas etapas distintas: enviando o sinal e recebendo o sinal. Enviando um sinal, o kernel 
+    envia o sinal para o processo , através da atualização de alguns status no contexto do processo destinado. Recebendo um 
+    sinal, o processo recebe o sinal quando este é forçado pelo kernel a reagir de alguma maneira ao sinal recebido. 
+    Um sinal enviado que não foi recebido é chamado de sinal pendente.
+   </p>
+   
+   <p>
+    Tratando problemas com sinais, esses problemas estão diretamente ligados aos processos que receberam um sinal e então 
+    terminaram. Entretanto, alguns sub problemas são gerados quando um processo recebe mais de um sinal. Sinais pendentes 
+    bloqueados, um manipulador de sinais tipicamente bloqueia sinais pendentes que estão atualmente sendo processados pelo 
+    manipulador. Sinais pendentes não enfileirados, pode haver no máximo 1 tipo de sinal pendente. Chamadas de sistema podem 
+    ser interrompidas, chamadas de sistema tais como, read, wait e accept, que podem bloquear o processo por um longo 
+    período de duração são chamados de chamadas de sistemas lentas.
+   </p>
+   
+   <p>
+    Saltos não-locais são uma forma de fluxo de controle excepcional no nível de usuário, é fornecido pelas funções setjmp 
+    e longjmp e transfere o controle diretamente de uma função para outra que atualmente  está em execução, sem ter que 
+    passar pela sequência normal 	de chamada de retorno. A função setjmp salva o ambiente de chamada no buffer, declarando 
+    algo chamado a jmp_buf, onde serão armazenados as funções necessárias para fazer o salto, e retorno 0. A função longjmp 
+    usa as informações de setjmp para restaurar o ambiente de chamada do buffer e dispara um retorno da chamada setjmp, 
+    sendo o retorno , um valor diferente de 0.
+   </p>
+   
+   <p>
+    Ferramentas para manipulação de processos, os sistemas linux fornecem várias ferramentas úteis para monitorar e 
+    manipular processos “top, ps , renice, strace, pmap, /proc, kill. Renice altera a prioridade de execução de um processo, 
+    que são sinalizados entre 19 (menos significativo) até -20 (mais significativo).Ps lista os processos (incluindo os 
+    processos zumbis) que estão atualmente no sistema. Top, imprime as informações sobre o uso de recursos dos processos 
+    atuais. Pmap, exibe o mapa de memoria de um processo. /proc um sistema de arquivos virtuais que exportam dados do kernel
+    em formato ASCII que podem ser lidos pelos usuários do programa. 
    </p>
   </body>
   <style>
